@@ -3,7 +3,9 @@
 rollback() {
     echo; echo "Error occurred. Rolling back...";
 
-    mv -n "$source_backup" "$source"
+    if [ -e "$source_backup" ]; then
+        mv -n "$source_backup" "$source"
+    fi
     
     if [ -e "$destination" ]; then
         mv -n "$destination" "$trash"
@@ -24,14 +26,14 @@ trash="$confjar/.trash"
 
 if [ ! -d "$backup" ]; then
     echo "Creating backup directory: $backup..."
-    mkdir "$backup"
+    mkdir -p "$backup"
 fi
 if [ ! -d "$trash" ]; then
     echo "Creating trash directory: $trash..."
-    mkdir "$trash"
+    mkdir -p "$trash"
 fi
 
-install_yaml="$confjar/install.yaml"
+load_yaml="$confjar/load.yaml"
 name="$1"
 destination="$confjar/$name"
 source="$(realpath "${2:-$(pwd)}")"
@@ -58,28 +60,27 @@ source_backup="$backup/$name"
 
 if [ $is_source_file = true ]; then
     echo "Source is a file, creating source backup directory and file..."
-    mkdir "$source_backup"
+    mkdir -p "$source_backup"
 
     source_backup="$source_backup/$source_filename"
     touch "$source_backup"
 fi
 
-echo "Copying source to backup: $source_backup.."
+echo "Copying source to backup: $source_backup..."
 cp -r "$source" "$source_backup"
 
-echo "Creating destination directory: $destination..."
-mkdir -p "$destination"
-destination="$(realpath "$destination")"
-
-echo "Simulating error"
-false
+if [ $is_source_file = true ]; then
+    echo "Creating destination directory: $destination..."
+    mkdir -p "$destination"
+    destination="$(realpath "$destination")"
+fi
 
 echo "Replacing source '$source' with destination '$destination'..."
 mv -n "$source" "$destination"
 
 if [ $is_source_file = true ]; then
     echo "Source is a file, creating file on destination..."
-    destination="$destination/$(basename "$source")"
+    destination="$destination/$source_filename"
     touch "$destination"
 else
     echo "Source is a directory, creating directory..."
@@ -90,10 +91,10 @@ echo "Creating symbolic link from '$source' to '$destination'..."
 ln -s "$destination" "$source"
 
 homeless_source=${source/#$HOME\//}
-install_row="$name: \"$homeless_source\"" 
-echo "Appending row '$install_row' to file $install_yaml..."
+load_row="$name: \"$homeless_source\"" 
+echo "Appending row '$load_row' to load file..."
 
-echo "$install_row" >> "$install_yaml"
+echo "$load_row" >> "$load_yaml"
 
 echo
 echo "Configuration of $name successfully linked to confjar"
