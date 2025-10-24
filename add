@@ -1,0 +1,101 @@
+#!/bin/env bash
+
+rollback() {
+    echo; echo "Error occurred. Rolling back...";
+
+    mv -n "$source_backup" "$source"
+    
+    if [ -e "$destination" ]; then
+        mv -n "$destination" "$trash"
+    fi
+}
+
+set -euo pipefail
+trap rollback ERR
+
+if [ $# -eq 0 ]; then
+    echo "Args <config name> <(config path | file name)?>"
+    exit 1
+fi
+
+confjar="$HOME/confjar"
+backup="$confjar/.backup"
+trash="$confjar/.trash"
+
+if [ ! -d "$backup" ]; then
+    echo "Creating backup directory: $backup..."
+    mkdir "$backup"
+fi
+if [ ! -d "$trash" ]; then
+    echo "Creating trash directory: $trash..."
+    mkdir "$trash"
+fi
+
+install_yaml="$confjar/install.yaml"
+name="$1"
+destination="$confjar/$name"
+source="$(realpath "${2:-$(pwd)}")"
+source_filename="$(basename "$source")"
+
+if [ ! -e "$source" ]; then
+    echo "Error: source '$source' does not exist"
+    exit 1;
+fi
+if [ -e "$destination" ]; then
+    echo "Error: destination '$destination' already exists"
+    exit 1;
+fi
+
+is_source_file=false
+if [ -f $source ]; then
+    is_source_file=true
+elif [ ! -d $source ]; then
+    echo "Error: $source is neither file nor directory"
+    exit 1
+fi
+
+source_backup="$backup/$name"
+
+if [ $is_source_file = true ]; then
+    echo "Source is a file, creating source backup directory and file..."
+    mkdir "$source_backup"
+
+    source_backup="$source_backup/$source_filename"
+    touch "$source_backup"
+fi
+
+echo "Copying source to backup: $source_backup.."
+cp -r "$source" "$source_backup"
+
+echo "Creating destination directory: $destination..."
+mkdir -p "$destination"
+destination="$(realpath "$destination")"
+
+echo "Simulating error"
+false
+
+echo "Replacing source '$source' with destination '$destination'..."
+mv -n "$source" "$destination"
+
+if [ $is_source_file = true ]; then
+    echo "Source is a file, creating file on destination..."
+    destination="$destination/$(basename "$source")"
+    touch "$destination"
+else
+    echo "Source is a directory, creating directory..."
+    mkdir -p "$(dirname "$source")"
+fi
+
+echo "Creating symbolic link from '$source' to '$destination'..."
+ln -s "$destination" "$source"
+
+homeless_source=${source/#$HOME\//}
+install_row="$name: \"$homeless_source\"" 
+echo "Appending row '$install_row' to file $install_yaml..."
+
+echo "$install_row" >> "$install_yaml"
+
+echo
+echo "Configuration of $name successfully linked to confjar"
+echo
+
