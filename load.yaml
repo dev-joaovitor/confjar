@@ -1,3 +1,5 @@
 tmux: ".tmux.conf"
 nvim: ".config/nvim"
 alacritty: ".config/alacritty"
+bashrc: ".bashrc"
+bash_profile: ".bash_profile"
