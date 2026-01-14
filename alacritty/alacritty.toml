@@ -1,0 +1,32 @@
+[window]
+decorations = "None"
+startup_mode = "Maximized"
+dynamic_padding = true
+
+[font]
+size = 16.0
+
+[font.normal]
+family = "Iosevka Term"
+style = "Regular"
+
+[terminal]
+shell = { program = "wsl.exe", args = ["-d", "archlinux", "--cd", "~"] }
+
+[scrolling]
+history = 10000
+
+[env]
+TERM = "xterm-256color"
+
+[cursor]
+[cursor.style]
+shape = "Block"
+blinking = "On"
+
+[keyboard]
+bindings = [
+	{ key = "V", mods = "Control|Shift", action = "Paste" },
+	{ key = "C", mods = "Control|Shift", action = "Copy" },
+]
+
