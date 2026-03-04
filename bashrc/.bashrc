@@ -25,12 +25,20 @@ export NVM_DIR="$HOME/.nvm"
 TMUX_DEFAULT_SESSION="$HOME/tmux-scripts/main.sh"
 [ -s "$TMUX_DEFAULT_SESSION" ] && "$TMUX_DEFAULT_SESSION" || echo "tmux default session not defined"
 
+# --- Mise --- #
+eval "$(~/.local/bin/mise activate bash)"
+
 # --- Aliases --- #
+
+nvim_func() {
+    nvim ${@:-.}
+}
 
 alias ls='ls --color=auto'
 alias ll='ls -lhA'
 alias grep='grep --color=auto'
-alias vim='nvim'
+alias vim='nvim_func'
+alias vi='vim'
 
 # --- OK --- #
 echo Hey Jimmyyyyy, everything is OK with your .bashrc
