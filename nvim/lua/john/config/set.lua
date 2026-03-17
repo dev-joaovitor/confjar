@@ -27,7 +27,7 @@ vim.o.expandtab = true
 vim.o.smartindent = true
 vim.o.cindent = true
 
-vim.o.hlsearch = false
+vim.o.hlsearch = true
 vim.o.incsearch = true
 
 vim.o.termguicolors = true
