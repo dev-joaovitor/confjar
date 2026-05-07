@@ -20,7 +20,7 @@ return {
                 map("K", vim.lsp.buf.hover, "Hover Docs")
                 map("gd", vim.lsp.buf.definition, "[G]o to [D]efinition")
                 map("gD", vim.lsp.buf.declaration, "[G]o to [D]eclaration")
-                map("gD", vim.lsp.buf.code_action, "[G]o to [D]eclaration")
+                map("gca", vim.lsp.buf.code_action, "[G]o to [C]ode [A]ction")
                 map("grn", vim.lsp.buf.rename, "[G]et to [R]e[n]ame")
                 map(
                     "<leader>e",
@@ -28,6 +28,16 @@ return {
                         vim.diagnostic.open_float({ scope = "line" })
                     end,
                     "Show [E]rror"
+                )
+                map(
+                    "<leader>ne",
+                    vim.diagnostic.goto_next,
+                    "Go to [N]ext [E]rror"
+                )
+                map(
+                    "<leader>pe",
+                    vim.diagnostic.goto_prev,
+                    "Go to [P]revious [E]rror"
                 )
             end
         })
@@ -50,13 +60,13 @@ return {
                         }
                     }
                 }
+            },
+            kotlin_lsp = {
+                single_file_support = false,
             }
         }
 
-        local blink_capabilities = require("blink.cmp").get_lsp_capabilities()
-
         for server, config in pairs(servers) do
-            config.capabilites = blink_capabilities
             vim.lsp.config(server, config)
         end
 

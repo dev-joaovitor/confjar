@@ -26,11 +26,12 @@ return {
                     cmp.scroll_documentation_up(4)
                 end,
             },
+            ["<C-n>"] = { "show", "show_documentation", "hide_documentation" } -- <C-e> -> hide
         },
 
         appearance = {
             nerd_font_variant = "mono",
-            kind_icons = {              -- supply glyphs your font actually has
+            kind_icons = { -- supply glyphs your font actually has
                 Text = "ſ", Method = "->", Function = "->", Constructor = "->",
                 Field = "µ", Variable = "->", Class = "->", Interface = "->",
                 Module = "->", Property = "->", Unit = "->", Value = "->",
