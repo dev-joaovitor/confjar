@@ -14,6 +14,8 @@ PS1="\[\e[32m\]\u@\h\[\e[0m\]:\[\e[34m\]\w\[\e[0m\]\$ "
 export NVIM_DIR="$HOME/.config/nvim"
 [ ! -d "$NVIM_DIR" ] && echo "NeoVim not installed"
 
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
 # --- Node Version Manager (nvm) --- #
 
 export NVM_DIR="$HOME/.nvm"
@@ -31,12 +33,22 @@ eval "$(~/.local/bin/mise activate bash)"
 # --- Docker --- #
 alias dclean="docker system prune -f"
 alias dlog="docker logs -f --tail 50"
-alias dstopall="docker stop \$(docker ps -aq) && docker ps -a"
+alias dstopall="([[ -z \"\$(docker ps -q)\" ]] && echo \"No containers are running\") || (docker stop \$(docker ps -q) && docker ps -a)"
+
+# VNET ONLY
+alias dvnet="docker-compose -f ~/ueek/vnet-redo/dev-env/docker-compose.dev.yml"
+alias dvnetconfig="cd ~/ueek/vnet-redo/dev-env && vim"
 
 # --- Git --- #
 
 git_development() {
     CURRENT_BRANCH=$(git branch --show-current)
+
+    if [[ $CURRENT_BRANCH == "development" ]]; then
+        echo "Already on 'development'. Pulling..."
+        git pull
+        return
+    fi
 
     git checkout development \
         && git pull \
